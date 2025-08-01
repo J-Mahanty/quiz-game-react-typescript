@@ -1,6 +1,21 @@
 import { createContext, useContext, useReducer } from 'react';
 
-export type Status = "idle" | "fetching" | "ready" ;
+export type Status = "idle" | "fetching" | "ready" | "error" ;
+
+export interface Question {
+    type: 'multiple' | 'boolean';
+    difficulty: 'easy' | 'medium' | 'hard';
+    category: string;
+    question: string;
+    correct_answer: string;
+    incorrect_answers: string[];
+}
+
+export interface QuestionResponse {
+    response_code: number;
+    results: Question[];
+}
+
 
 interface QuizContext {
     state: QuizState,
@@ -8,20 +23,35 @@ interface QuizContext {
 }
 
 interface QuizState {
-    gameStatus: Status
+    gameStatus: Status,
+    question: Question | null
 }
 
 const initialState : QuizState = {
-    gameStatus: "idle"
+    gameStatus: "idle",
+    question: null
 }
 
-type QuizAction = { type: "setStatus"; payload: Status }
+type QuizAction = 
+    { type: "setStatus"; payload: Status } | 
+    { type: "setQuestion"; payload: Question}
 
 
 const QuizContext = createContext<QuizContext>({
     state: initialState,
     dispatch: () => null
 });
+
+function QuizReducer(state: QuizState, action: QuizAction): QuizState {
+  switch (action.type) {
+    case "setQuestion":
+        return {...state, question: action.payload};
+    case "setStatus":
+        return {...state, gameStatus: action.payload};
+    default:
+        throw new Error("Unknown action");
+  }
+}
 
 export function QuizProvider({children}: {children: React.ReactNode}) {
     const [state, dispatch] = useReducer(QuizReducer, initialState);
@@ -37,11 +67,3 @@ export function useQuiz() {
     return useContext(QuizContext);
 }
 
-function QuizReducer(state: QuizState, action: QuizAction): QuizState {
-  switch (action.type) {
-    case "setStatus":
-      return {...state, gameStatus: action.payload};
-    default:
-      throw new Error("Unknown action");
-  }
-}
