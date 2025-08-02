@@ -1,6 +1,6 @@
 import './Game.scss';
 import AnswerOption from './AnswerOption.tsx';
-import Result from './Result.tsx';
+// import Result from './Result.tsx';
 import { useQuiz } from './QuizContext.tsx';
 import {decode} from 'html-entities';
 
@@ -22,9 +22,13 @@ function Game() {
                     })}
                 </div>
                
-                <button>Submit</button>
+               {
+                    state.userAnswer && 
+                    <button>Submit</button>
+               }
+
                 
-                <Result />
+                {/* <Result /> */}
                 
             </div>
             
